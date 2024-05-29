@@ -3,7 +3,6 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
-const express = require("express");
 
 beforeEach(() => {
   return seed(data);
@@ -32,7 +31,46 @@ describe("GET /api/topics", () => {
     return request(app)
       .get("/api/tpics")
       .expect(404)
-      .then(({body}) => expect(body.msg)
-      .toBe("Not Found"));
+      .then(({ body }) => expect(body.msg).toBe("Not Found"));
   });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("200: return an article object with the correct properties based on the article id", () => {
+    return request(app)
+      .get("/api/articles/3")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        articles.forEach((article) =>
+          expect(article).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            body: expect.any(String),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          })
+        );
+      });
+  });
+  test.only("400: Bad Request when an invalid id is given", () => {
+    return request(app)
+    .get('/api/articles/not-valid-id')
+    .expect(400)
+    .then((response) => {
+        expect(response.body.msg).toBe("Bad Request")
+    })
+  })
+
+  test.only("404: Not Found when an id is valid but does not exist", () => {
+    return request(app)
+    .get('/api/articles/500')
+    .expect(404)
+    .then((response) => {
+        expect(response.body.msg).toBe("Not Found")
+    })
+  })
 });
