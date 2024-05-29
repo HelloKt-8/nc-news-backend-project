@@ -28,7 +28,7 @@ describe("GET /api/topics", () => {
       });
   });
 
-  test("400: returns 'not found' when api topics endpoint is invalid due to typo or different endpoint received", () => {
+  test("404: returns 'not found' when api topics endpoint is invalid due to typo or different endpoint received", () => {
     return request(app)
       .get("/api/tpics")
       .expect(404)
