@@ -95,7 +95,7 @@
       ]
     }
   },
-  "POST /api/articles/": {
+  "PATCH /api/articles/": {
     "description": "updates votes and returns the updated article",
     "queries": ["sort_by", "order","article_id"],
     "exampleResponse": {
@@ -112,6 +112,10 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment based on a given comment id, will return an empty body",
+    "queries": ["comment_id"],
+    "exampleResponse":{}
   }
-
 }
