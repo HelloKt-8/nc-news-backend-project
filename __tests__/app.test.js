@@ -146,7 +146,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/1/comments?sort_by=created_at&order=desc")
       .expect(200)
       .then(({ body }) => {
-        const { comments } = body; 
+        const { comments } = body;
         expect(comments).toBeSortedBy("created_at", {
           coerce: true,
           descending: true,
@@ -182,16 +182,18 @@ describe("PATCH /api/articles/:article_id", () => {
       })
       .then(({ body }) => {
         const { article } = body;
-        expect(article.votes).toBe(10); 
+        expect(article.votes).toBe(10);
         expect(article.article_id).toBe(4);
-        expect(article.title).toBe('Student SUES Mitch!');
-        expect(article.topic).toBe('mitch');
-        expect(article.author).toBe('rogersop');
-        expect(article.body).toBe('We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages')
-        expect(article.created_at).toBe('2020-05-06T01:14:00.000Z')
-        expect(article.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
-        
-
+        expect(article.title).toBe("Student SUES Mitch!");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("rogersop");
+        expect(article.body).toBe(
+          "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages"
+        );
+        expect(article.created_at).toBe("2020-05-06T01:14:00.000Z");
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
       });
   });
 
@@ -204,15 +206,16 @@ describe("PATCH /api/articles/:article_id", () => {
       })
       .then(({ body }) => {
         const { article } = body;
-        expect(article.votes).toBe(50); 
+        expect(article.votes).toBe(50);
         expect(article.article_id).toBe(1);
-        expect(article.title).toBe('Living in the shadow of a great man');
-        expect(article.topic).toBe('mitch');
-        expect(article.author).toBe('butter_bridge');
-        expect(article.body).toBe("I find this existence challenging")
-        expect(article.created_at).toBe('2020-07-09T20:11:00.000Z')
-        expect(article.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
-
+        expect(article.title).toBe("Living in the shadow of a great man");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("butter_bridge");
+        expect(article.body).toBe("I find this existence challenging");
+        expect(article.created_at).toBe("2020-07-09T20:11:00.000Z");
+        expect(article.article_img_url).toBe(
+          "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        );
       });
   });
 
@@ -261,13 +264,12 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Bad Request");
       });
   });
-
 });
 
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: delete a comment given the comment_id resulting in an empty body", () => {
     return request(app).delete("/api/comments/3").expect(204);
-  })
+  });
 
   test("404: error message when given a non-existent id", () => {
     return request(app)
@@ -285,6 +287,30 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(response.body.msg).toBe("Bad Request");
       });
   });
+});
 
+describe("GET /api/users", () => {
+  test("200: return an array of users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBe(4);
+        const { users } = body;
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
 
-})
+  test("404: returns 'not found' when api users endpoint is invalid due to typo or different endpoint received", () => {
+    return request(app)
+      .get("/api/user")
+      .expect(404)
+      .then(({ body }) => expect(body.msg).toBe("Not Found"));
+  });
+});
