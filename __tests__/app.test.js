@@ -314,3 +314,58 @@ describe("GET /api/users", () => {
       .then(({ body }) => expect(body.msg).toBe("Not Found"));
   });
 });
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("200: sucessfully adds a comment to the given article_id", () => {
+    return request(app)
+      .post("/api/articles/6/comments")
+      .expect(201)
+      .send({
+        username: "hello kitty",
+        body: "Hello Kitty is a girl in a costume",
+      })
+      .then(({ body }) => {
+        expect(body.comment.body).toBe("Hello Kitty is a girl in a costume");
+      });
+  });
+
+  test("400: responds with a Bad Request when given an invalid-id", () => {
+    return request(app)
+      .post("/api/articles/invalid-id/comments")
+      .expect(400)
+      .send({
+        username: "hello kitty",
+        body: "Hello Kitty is a girl in a costume",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad Request");
+      });
+  });
+
+  test("404: responds with a Not Found when given an non existent article-id", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .expect(404)
+      .send({
+        username: "hello kitty",
+        body: "Hello Kitty is a girl in a costume",
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Not Found");
+      });
+  });
+
+  test("400: responds with a Bad Request when no comment is sent", () => {
+    return request(app)
+      .post("/api/articles/5/comments")
+      .expect(400)
+      .send({
+        username: "hello kitty",
+        body: null,
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad Request");
+      });
+  });
+
+});
