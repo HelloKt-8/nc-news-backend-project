@@ -3,7 +3,7 @@ const endpointsApp = require("../endpointsApp");
 const fs = require("fs");
 const path = require("path");
 
-xdescribe("GET/api", () => {
+describe("GET/api", () => {
   test("should respond with JSON object describing all endpoints", () => {
     fs.readFile("endpoints.json", "utf-8", (err, data) => {
       if (err) {
