@@ -262,7 +262,29 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 
-
-
-
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: delete a comment given the comment_id resulting in an empty body", () => {
+    return request(app).delete("/api/comments/3").expect(204);
+  })
+
+  test("404: error message when given a non-existent id", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("comment_id does not exist");
+      });
+  });
+  test("DELETE:400  error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/not-a-team")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad Request");
+      });
+  });
+
+
+})
