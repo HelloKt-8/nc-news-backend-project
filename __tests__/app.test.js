@@ -3,7 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
-require('jest-sorted');
+require("jest-sorted");
 
 beforeEach(() => {
   return seed(data);
@@ -67,7 +67,7 @@ describe("GET /api/articles/:article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test.only("200: return an array of all articles with all the correct properties", () => {
+  test("200: return an array of all articles with all the correct properties", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
@@ -88,18 +88,21 @@ describe("GET /api/articles", () => {
       });
   });
 
-  test.only("200: returns articles array sorted by date in descending order ", () => {
+  test("200: returns articles array sorted by date in descending order ", () => {
     return request(app)
       .get("/api/articles?sort_by=created_at&order=desc")
       .expect(200)
-      .then(({body}) => {
-        const {articles} = body
-        expect(articles.length).toBe(13)
-        expect(articles).toBeSortedBy("created_at", {coerce: true, descending: true});
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles.length).toBe(13);
+        expect(articles).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: true,
+        });
       });
   });
 
-  test.only("400: Bad Request when sort by query is not valid", () => {
+  test("400: Bad Request when sort by query is not valid", () => {
     return request(app)
       .get("/api/articles?sort_by=cheese&order=desc")
       .expect(400)
@@ -108,12 +111,63 @@ describe("GET /api/articles", () => {
       });
   });
 
-  test.only("400: Bad Request when order by query is not valid", () => {
+  test("400: Bad Request when order by query is not valid", () => {
     return request(app)
       .get("/api/articles?sort_by=created_at&order=cheese")
       .expect(400)
       .then((response) => {
         expect(response.body.msg).toBe("Invalid Order Request");
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: returns an array of all comments for a given article with the correct properties", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+
+  test("200: comments should return with the most recent comments first, if article_id has comments", () => {
+    return request(app)
+      .get("/api/articles/1/comments?sort_by=created_at&order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body; 
+        expect(comments).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+
+  test("404: if there article id exists but there are no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("This article has no comments");
+      });
+  });
+  test("400: Bad Request when given an invalid id", () => {
+    return request(app)
+      .get("/api/articles/not-an-id/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad Request");
       });
   });
 });
