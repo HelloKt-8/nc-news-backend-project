@@ -171,3 +171,98 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: responds with the updated article with positive inc votes", () => {
+    return request(app)
+      .patch("/api/articles/4")
+      .expect(200)
+      .send({
+        inc_votes: 10,
+      })
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.votes).toBe(10); 
+        expect(article.article_id).toBe(4);
+        expect(article.title).toBe('Student SUES Mitch!');
+        expect(article.topic).toBe('mitch');
+        expect(article.author).toBe('rogersop');
+        expect(article.body).toBe('We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages')
+        expect(article.created_at).toBe('2020-05-06T01:14:00.000Z')
+        expect(article.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+        
+
+      });
+  });
+
+  test("200: responds with the updated article with negative inc votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .expect(200)
+      .send({
+        inc_votes: -50,
+      })
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.votes).toBe(50); 
+        expect(article.article_id).toBe(1);
+        expect(article.title).toBe('Living in the shadow of a great man');
+        expect(article.topic).toBe('mitch');
+        expect(article.author).toBe('butter_bridge');
+        expect(article.body).toBe("I find this existence challenging")
+        expect(article.created_at).toBe('2020-07-09T20:11:00.000Z')
+        expect(article.article_img_url).toBe('https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700')
+
+      });
+  });
+
+  test("400: error when invalid article_id is given", () => {
+    return request(app)
+      .patch("/api/articles/not-valid-id")
+      .expect(400)
+      .send({
+        inc_votes: 10,
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Bad Request");
+      });
+  });
+
+  test("404: error when article id is valid but does not exist", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .expect(404)
+      .send({
+        inc_votes: 10,
+      })
+      .then((response) => {
+        expect(response.body.msg).toBe("Article Id does not exist");
+      });
+  });
+
+  test("400: error when invalid inc_votes body is given", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .expect(400)
+      .send({
+        inc_votes: "not_a_number",
+      })
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+
+  test("400: error when inc_votes body is malformed", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .expect(400)
+      .send({})
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad Request");
+      });
+  });
+
+
+
+
+});
