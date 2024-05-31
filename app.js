@@ -15,13 +15,13 @@ const app = express();
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
-app.get("/api/articles/:article_id", getArticlesId);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.patch("/api/articles/:article_id", patchArticleVotes);
 app.delete("/api/comments/:comment_id", deleteComment);
 app.get("/api/users", getUsers);
 app.post("/api/articles/:article_id/comments", postComment);
+app.get("/api/articles/:article_id", getArticlesId);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Not Found" });
