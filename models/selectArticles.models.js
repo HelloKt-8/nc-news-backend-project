@@ -51,18 +51,36 @@ exports.patchArticleVotesById = (article_id, inc_votes) => {
 
 exports.createComment = (article_id, newComment) => {
   const { username, body } = newComment;
-  return db
-    .query(
-      `INSERT INTO users (username, name, avatar_url) VALUES ($1, $2, $3)`,
-      [username, username, "placeholder"]
-    )
-    .then(() => {
-      return db.query(
-        `INSERT INTO comments (body, article_id, author) VALUES ($1, $2, $3) RETURNING *;`,
-        [body, article_id, username]
-      );
-    })
-    .then((data) => {
-      return data.rows[0];
-    })
+
+  console.log("CREATE NEW COMMENT MODEL", newComment); 
+
+  return db.query(
+    `INSERT INTO comments (body, article_id, author) 
+     VALUES ($1, $2, $3) 
+     RETURNING *;`,
+    [body, article_id, username]
+  ).then((data) => {
+    console.log(data, "<<<FROM API TO MODELS")
+    return data.rows[0];
+  });
+};
+
+exports.fetchArticleById = (article_id) => {
+  return db.query(
+    `SELECT * FROM articles WHERE article_id = $1;`,
+    [article_id]
+  ).then((result) => {
+    return result.rows[0];
+  });
+};
+
+exports.fetchUserByUsername = (username) => {
+  console.log(username, ">>USERNAME FROM MODELS")
+  return db.query(
+    `SELECT * FROM users WHERE username = $1;`,
+    [username]
+  ).then((result) => {
+    console.log(result, ">>RESULT FROM USERNAME")
+    return result.rows[0];
+  });
 };

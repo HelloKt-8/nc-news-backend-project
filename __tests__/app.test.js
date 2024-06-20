@@ -316,16 +316,19 @@ describe("GET /api/users", () => {
 });
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test("200: sucessfully adds a comment to the given article_id", () => {
+  test("201: sucessfully adds a comment to the given article_id", () => {
     return request(app)
       .post("/api/articles/6/comments")
       .expect(201)
       .send({
-        username: "hello kitty",
-        body: "Hello Kitty is a girl in a costume",
+        username: 'butter_bridge',
+        body: 'Eius dolor qui ut eligendi. Vero et animi consequatur placeat repudiandae ex dolores qui magni',
       })
       .then(({ body }) => {
-        expect(body.comment.body).toBe("Hello Kitty is a girl in a costume");
+        console.log(body, ">>FROM TESTS")
+        expect(body.comment.body).toBe("Eius dolor qui ut eligendi. Vero et animi consequatur placeat repudiandae ex dolores qui magni");
+        expect(body.comment.author).toBe("butter_bridge");
+        expect(body.comment.article_id).toBe(6);
       });
   });
 
@@ -334,8 +337,8 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/invalid-id/comments")
       .expect(400)
       .send({
-        username: "hello kitty",
-        body: "Hello Kitty is a girl in a costume",
+        username: "cooljmessy",
+        body: "Eius dolor qui ut eligendi. Vero et animi consequatur placeat repudiandae ex dolores qui magni",
       })
       .then((response) => {
         expect(response.body.msg).toBe("Bad Request");
@@ -347,11 +350,11 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/999/comments")
       .expect(404)
       .send({
-        username: "hello kitty",
-        body: "Hello Kitty is a girl in a costume",
+        username: "cooljmessy",
+        body: "Eius dolor qui ut eligendi. Vero et animi consequatur placeat repudiandae ex dolores qui magni",
       })
       .then((response) => {
-        expect(response.body.msg).toBe("Not Found");
+        expect(response.body.msg).toBe("Article not found");
       });
   });
 
@@ -360,7 +363,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/5/comments")
       .expect(400)
       .send({
-        username: "hello kitty",
+        username: "cooljmessy",
         body: null,
       })
       .then((response) => {
